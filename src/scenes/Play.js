@@ -37,15 +37,20 @@ class Play extends Phaser.Scene {
         const mazeLayer = map.createLayer('maze', tileset, 0, 0)
         mazeLayer.setCollisionByProperty({ collide: true })
 
+        // game variables
+        this.score = 0
+        this.chestfound = 0
+        this.gameOver = false
+
         // object layer
         const objectsLayer = map.getObjectLayer('objects')
 
         // iterate through objects 
-        // object of class player: create a sprite called player with sprite.png at that location that can be moved by the player
-        // object of class octopus: create a sprite called octopus with octopus.png that moves randomly and can collide with player and boundaries
-        // object of class squida: create a sprite called squida with squid1.png that moves randomly and can collide with player and boundaries.
-        // object of class squidb: create a sprite called squidb with squid2.png that moves randomly and can collide with player and boundaries.
-        // object of class chest: create a sprite called chest with chest.png that can be collected for points and temporarily hidden from the game
+        // class player: create sprite called player with sprite.png at that location that can be moved by the player
+        // class octopus: create sprite called octopus with octopus.png that moves randomly, can collide with player and boundaries
+        // class squida: create sprite called squida with squid1.png that moves randomly, can collide with player and boundaries
+        // of class squidb: create sprite called squidb with squid2.png that moves randomly, can collide with player and boundaries
+        // of class chest: create sprite called chest with chest.png that can be collected for points and temporarily hidden from the game
         objectsLayer.objects.forEach(obj => {
             switch (obj.type) {
                 case 'player':
@@ -90,7 +95,7 @@ class Play extends Phaser.Scene {
                     const chest = this.physics.add.sprite(obj.x, obj.y, 'chest')
                     chest.body.setCollideWorldBounds(true)
                     this.physics.add.collider(chest, mazeLayer)
-                    // Add logic for collecting chest here
+                    
                     break
     
                 default:
