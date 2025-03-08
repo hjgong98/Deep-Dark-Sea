@@ -12,6 +12,14 @@ class Play extends Phaser.Scene {
 
         // load the tilemap JSON file
         this.load.tilemapTiledJSON('mapJSON', 'assets/map.json')
+
+        // load chest
+        this.load.image('chest', 'assets/chest.png')
+
+        // load sea creatures 
+        this.load.image('octopus', 'assets/octopus.png')
+        this.load.image('squida', 'assets/squid1.png')
+        this.load.image('squidb', 'assets/squid2.png')
     }
 
     create() {
@@ -23,11 +31,64 @@ class Play extends Phaser.Scene {
         const mazeLayer = map.createLayer('maze', tileset, 0, 0)
         mazeLayer.setCollisionByProperty({ collide: true })
 
-        // player sprite location from player object layer, look for the location of an object called 'playStart'
-        const playerSpawn = map.findObject('players', obj => obj.name === 'playStart')
-        this.player = this.physics.add.sprite(playerSpawn.x, playerSpawn.y, 'player')
-        this.player.body.setCollideWorldBounds(true)
-        this.physics.add.collider(this.player, mazeLayer)
+        // object layer
+        const objectsLayer = map.getObjectLayer('objects')
+
+        // iterate through objects 
+        // object of class player: create a sprite called player with sprite.png at that location that can be moved by the player
+        // object of class octopus: create a sprite called octopus with octopus.png that moves randomly and can collide with player and boundaries
+        // object of class squida: create a sprite called squida with squid1.png that moves randomly and can collide with player and boundaries.
+        // object of class squidb: create a sprite called squidb with squid2.png that moves randomly and can collide with player and boundaries.
+        // object of class chest: create a sprite called chest with chest.png that can be collected for points and temporarily hidden from the game
+        objectsLayer.objects.forEach(obj => {
+            switch (obj.type) {
+                case 'player':
+                    // Create player sprite
+                    this.player = this.physics.add.sprite(obj.x, obj.y, 'player')
+                    this.player.body.setCollideWorldBounds(true)
+                    this.physics.add.collider(this.player, mazeLayer)
+                    break
+    
+                case 'octopus':
+                    // Create octopus sprite
+                    const octopus = this.physics.add.sprite(obj.x, obj.y, 'octopus')
+                    octopus.body.setCollideWorldBounds(true)
+                    this.physics.add.collider(octopus, mazeLayer)
+                    this.physics.add.collider(octopus, this.player)
+                    // Add random movement logic for octopus here
+                    break;
+    
+                case 'squida':
+                    // Create squida sprite
+                    const squida = this.physics.add.sprite(obj.x, obj.y, 'squida')
+                    squida.body.setCollideWorldBounds(true)
+                    this.physics.add.collider(squida, mazeLayer)
+                    this.physics.add.collider(squida, this.player)
+                    // Add random movement logic for squida here
+                    break
+    
+                case 'squidb':
+                    // Create squidb sprite
+                    const squidb = this.physics.add.sprite(obj.x, obj.y, 'squidb')
+                    squidb.body.setCollideWorldBounds(true)
+                    this.physics.add.collider(squidb, mazeLayer)
+                    this.physics.add.collider(squidb, this.player)
+                    // Add random movement logic for squidb here
+                    break;
+    
+                case 'chest':
+                    // Create chest sprite
+                    const chest = this.physics.add.sprite(obj.x, obj.y, 'chest')
+                    chest.body.setCollideWorldBounds(true)
+                    this.physics.add.collider(chest, mazeLayer)
+                    // Add logic for collecting chest here
+                    break
+    
+                default:
+                    console.warn(`Unknown object type: ${obj.type}`)
+                    break
+            }
+        })
 
         //set up camera to follow player
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
@@ -39,8 +100,6 @@ class Play extends Phaser.Scene {
     }
 
     update() {
-        //use arrow keys to move player around
-
         // Player movement speed
         const speed = 200;
 
