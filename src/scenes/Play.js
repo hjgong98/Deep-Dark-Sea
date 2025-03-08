@@ -20,9 +20,15 @@ class Play extends Phaser.Scene {
         this.load.image('octopus', 'assets/octopus.png')
         this.load.image('squida', 'assets/squid1.png')
         this.load.image('squidb', 'assets/squid2.png')
+
+        // load sound
+        this.load.audio('underwater', 'assets/underwater ambiance.wav')
     }
 
     create() {
+        // Play underwater ambiance sound
+        this.sound.play('underwater', { loop: true, volume: 0.25 })
+
         // tilemap stuff
         const map = this.add.tilemap('mapJSON')
         const tileset = map.addTilesetImage('map', 'mapTiles')
@@ -56,7 +62,8 @@ class Play extends Phaser.Scene {
                     this.physics.add.collider(octopus, mazeLayer)
                     this.physics.add.collider(octopus, this.player)
                     // Add random movement logic for octopus here
-                    break;
+                    this.setupRandomMovement(octopus)
+                    break
     
                 case 'squida':
                     // Create squida sprite
@@ -65,6 +72,7 @@ class Play extends Phaser.Scene {
                     this.physics.add.collider(squida, mazeLayer)
                     this.physics.add.collider(squida, this.player)
                     // Add random movement logic for squida here
+                    this.setupRandomMovement(squida)
                     break
     
                 case 'squidb':
@@ -74,6 +82,7 @@ class Play extends Phaser.Scene {
                     this.physics.add.collider(squidb, mazeLayer)
                     this.physics.add.collider(squidb, this.player)
                     // Add random movement logic for squidb here
+                    this.setupRandomMovement(squidb)
                     break;
     
                 case 'chest':
@@ -96,7 +105,25 @@ class Play extends Phaser.Scene {
         
         this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
 
-        this.cursors = this.input.keyboard.createCursorKeys();
+        this.cursors = this.input.keyboard.createCursorKeys()
+    }
+
+    setupRandomMovement(sprite) {
+        // Random movement logic
+        this.time.addEvent({
+            delay: Phaser.Math.Between(1000, 3000), // Random delay between 1 and 3 seconds
+            callback: () => {
+                const directions = [
+                    { x: 1, y: 0 },   // Right
+                    { x: -1, y: 0 },  // Left
+                    { x: 0, y: 1 },   // Down
+                    { x: 0, y: -1 }   // Up
+                ]
+                const direction = Phaser.Utils.Array.GetRandom(directions)
+                sprite.setVelocity(direction.x * 100, direction.y * 100) // Move in random direction
+            },
+            loop: true
+        })
     }
 
     update() {
@@ -105,6 +132,7 @@ class Play extends Phaser.Scene {
 
         // Reset player velocity
         this.player.setVelocity(0);
+
         // Horizontal movement
         if (this.cursors.left.isDown) {
             this.player.setVelocityX(-speed); // Move left
@@ -123,5 +151,7 @@ class Play extends Phaser.Scene {
         if (this.cursors.left.isDown || this.cursors.right.isDown || this.cursors.up.isDown || this.cursors.down.isDown) {
             this.player.body.velocity.normalize().scale(speed);
         }
+
+        
     }
 }
