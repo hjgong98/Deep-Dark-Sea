@@ -23,7 +23,7 @@ class Play extends Phaser.Scene {
 
         // load sound
         this.load.audio('underwater', 'assets/underwater ambiance.wav')
-        this.load.audio('open chest', 'assets/open_chest.mp3')
+        this.load.audio('open chest', 'assets/open chest.wav')
     }
 
     create() {
@@ -66,6 +66,7 @@ class Play extends Phaser.Scene {
                     const octopus = this.physics.add.sprite(obj.x, obj.y, 'octopus')
                     octopus.body.setCollideWorldBounds(true)
                     this.physics.add.collider(octopus, mazeLayer)
+                    // player loses health when colliding with octopus
                     this.physics.add.collider(octopus, this.player)
                     // Add random movement logic for octopus here
                     this.setupRandomMovement(octopus)
@@ -76,6 +77,7 @@ class Play extends Phaser.Scene {
                     const squida = this.physics.add.sprite(obj.x, obj.y, 'squida')
                     squida.body.setCollideWorldBounds(true)
                     this.physics.add.collider(squida, mazeLayer)
+                    // player loses health when colliding with squida
                     this.physics.add.collider(squida, this.player)
                     // Add random movement logic for squida here
                     this.setupRandomMovement(squida)
@@ -86,17 +88,20 @@ class Play extends Phaser.Scene {
                     const squidb = this.physics.add.sprite(obj.x, obj.y, 'squidb')
                     squidb.body.setCollideWorldBounds(true)
                     this.physics.add.collider(squidb, mazeLayer)
+                    // player loses health when colliding with squidb
                     this.physics.add.collider(squidb, this.player)
                     // Add random movement logic for squidb here
                     this.setupRandomMovement(squidb)
-                    break;
+                    break
     
                 case 'chest':
                     // Create chest sprite
                     const chest = this.physics.add.sprite(obj.x, obj.y, 'chest')
+                    chest.body.setImmovable(true)
                     chest.body.setCollideWorldBounds(true)
                     this.physics.add.collider(chest, mazeLayer)
-                    this.physics.add.collider(chest, this.player)
+                    // add collect chest interaction here
+                    this.physics.add.overlap(chest, this.player, this.collectChest, null, this)
                     break
     
                 default:
@@ -238,16 +243,17 @@ class Play extends Phaser.Scene {
             this.chestfound += 1
         } */
     }
-    
-    /* checkCollision(player, chest) {
-        // if player sprite touches chest sprite return true else return false
-        const playerBounds = player.getBounds()
-        const chestBounds = chest.getBounds()
 
-        if (Phaser.Geom.Intersects.REctangleToRectangle(playerBounds, chestBounds)) {
-            return True
-        } else {
-            return false
-        }
-    } */
+    collectChest(player, chest) {
+        this.sound.play('open chest', { loop: false, volume: 1})
+
+        // hide the chest png
+        chest.disableBody(true, true)
+
+        this.score += Phaser.Math.Between(25, 50)
+        console.log(this.score)
+
+        this.chestfound += 1
+        console.log(this.chestfound)
+    }
 }
