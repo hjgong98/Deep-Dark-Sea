@@ -23,6 +23,7 @@ class Play extends Phaser.Scene {
 
         // load sound
         this.load.audio('underwater', 'assets/underwater ambiance.wav')
+        this.load.audio('open chest', 'assets/open_chest.mp3')
     }
 
     create() {
@@ -95,7 +96,7 @@ class Play extends Phaser.Scene {
                     const chest = this.physics.add.sprite(obj.x, obj.y, 'chest')
                     chest.body.setCollideWorldBounds(true)
                     this.physics.add.collider(chest, mazeLayer)
-                    
+                    this.physics.add.collider(chest, this.player)
                     break
     
                 default:
@@ -111,7 +112,70 @@ class Play extends Phaser.Scene {
         this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
 
         this.cursors = this.input.keyboard.createCursorKeys()
+        
+        /* this.timeLeft = 20
+        this.timerEvent = this.time.addEvent({
+            delay: 1000,
+            callback: this.updateTimer,
+            callbackScope: this,
+            loop: true
+        }) */
     }
+
+    /* updateTimer() {
+        this.timeLeft--
+        
+        if (this.timeLeft === 0) {
+            this.timerEvent.remove()
+            this.gameOver = true
+            this.showGameOverScreen()
+        }
+    }
+
+    showGameOverScreen() {
+        this.physics.pause() 
+
+        const gameOverText = this.add.text(
+            this.cameras.main.centerX, 
+            this.cameras.main.centerY - 100,
+            'Game Over',
+            {
+                fontSize: '64px',
+                fill: '#ff0000',
+                fontStyle: 'bold'
+            }
+        ).setOrigin(0.5)
+
+        const resetButton = this.add.text(
+            this.cameras.main.centerX,
+            this.cameras.main.centerY,
+            'Reset',
+            {
+                fontSize: '32px',
+                fill: '#00ff00',
+                fontStyle: 'bold'
+            }
+        ).setOrigin(0.5).setInteractive()
+
+        resetButton.on('pointerdown', () => {
+            this.scene.restart()
+        })
+
+        const menuButton = this.add.text(
+            this.cameras.main.centerX,
+            this.cameras.main.centerY + 100,
+            'Back to Menu',
+            {
+                fontSize: '32px',
+                fill: '#00ff00',
+                fontSytle: 'bold'
+            }
+        ).setOrigin(0.5).setInteractive()
+
+        menuButton.on('pointerdown', () => {
+            this.scene.start('Menu')
+        })
+    } */
 
     setupRandomMovement(sprite) {
         // Random movement logic
@@ -132,6 +196,8 @@ class Play extends Phaser.Scene {
     }
 
     update() {
+        if (this.gameOver) return
+
         // Player movement speed
         const speed = 200;
 
@@ -157,6 +223,31 @@ class Play extends Phaser.Scene {
             this.player.body.velocity.normalize().scale(speed);
         }
 
-        
+        /* // check collisions
+        if(this.checkCollision(this.player, this.chest)){
+            // play chest open sound
+            this.sound.play('open chest')
+
+            // hide chest
+            this.chest.disableBody(true, true)
+
+            // this.score += random number between 25 and 50
+            this.score += Phaser.Math.Between(25, 50)
+
+            // this.chestfound += 1
+            this.chestfound += 1
+        } */
     }
+    
+    /* checkCollision(player, chest) {
+        // if player sprite touches chest sprite return true else return false
+        const playerBounds = player.getBounds()
+        const chestBounds = chest.getBounds()
+
+        if (Phaser.Geom.Intersects.REctangleToRectangle(playerBounds, chestBounds)) {
+            return True
+        } else {
+            return false
+        }
+    } */
 }
