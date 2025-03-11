@@ -29,6 +29,24 @@ class Play extends Phaser.Scene {
     create() {
         // Play underwater ambiance sound
         this.sound.play('underwater', { loop: true, volume: 1 })
+        const controlScheme = this.registry.get('controls') || 'arrows'
+
+        // Set up controls based on the selected scheme
+        if (controlScheme === 'wasd') {
+            this.cursors = this.input.keyboard.addKeys({
+                left: Phaser.Input.Keyboard.KeyCodes.A,
+                right: Phaser.Input.Keyboard.KeyCodes.D,
+                up: Phaser.Input.Keyboard.KeyCodes.W,
+                down: Phaser.Input.Keyboard.KeyCodes.S
+            })
+        } else if (controlScheme === 'arrows') {
+            this.cursors = this.input.keyboard.addKeys({
+                left: Phaser.Input.Keyboard.KeyCodes.LEFT,
+                right: Phaser.Input.Keyboard.KeyCodes.RIGHT,
+                up: Phaser.Input.Keyboard.KeyCodes.UP,
+                down: Phaser.Input.Keyboard.KeyCodes.DOWN
+            })
+        }
 
         // tilemap stuff
         const map = this.add.tilemap('mapJSON')
@@ -118,11 +136,25 @@ class Play extends Phaser.Scene {
 
         this.cursors = this.input.keyboard.createCursorKeys()
 
-        this.clock = this.time.delayedCall(2000, () => {
+        /* this.clock = this.time.delayedCall(2000, () => {
             this.add.text(game.config.width / 2, game.config.height / 2, 'GAME OVER', scoreConfig).setOrigin(0.5)
             this.add.text(game.config.width / 2, game.config.height / 2 + 64, 'Press (R) to Restart or <- for Menu', scoreConfig).setOrigin(0.5)
             this.gameOver = true
-        }, null, this)
+        }, null, this) */
+
+        // Create the text object
+        const text = this.add.text(0, 0, 'Your Text Here', {
+            fontFamily: 'Arial',
+            fontSize: '24px',
+            fill: '#ffffff',
+            backgroundColor: '#000000'
+        });
+
+        // Fix the text to the camera
+        text.setScrollFactor(0); // This ensures the text doesn't move with the camera
+
+        // Position the text at the top-left corner of the camera
+        text.setPosition(this.cameras.main.worldView.x + 10, this.cameras.main.worldView.y + 10);
     }
 
     /* updateTimer() {
@@ -201,30 +233,70 @@ class Play extends Phaser.Scene {
     update() {
         if (this.gameOver) return
 
+        //text.setOrigin(0, 0);
+
         // Player movement speed
-        const speed = 200;
+        const speed = 200
 
         // Reset player velocity
-        this.player.setVelocity(0);
+        this.player.setVelocity(0)
+
+        if (this.cursors) {
+            if (this.cursors.left.isDown) {
+                this.player.setVelocityX(-speed)
+            } else if (this.cursors.right.isDown) {
+                this.player.setVelocityX(speed)
+            }
+
+            if (this.cursors.up.isDown) {
+                this.player.setVelocityY(-speed)
+            } else if (this.cursors.down.isDown) {
+                this.player.setVelocityY(speed)
+            }
+
+            // Optional: Normalize diagonal movement to prevent faster diagonal speed
+            if (this.cursors.left.isDown || this.cursors.right.isDown || this.cursors.up.isDown || this.cursors.down.isDown) {
+                this.player.body.velocity.normalize().scale(speed)
+            }
+        }
+
+        if (this.registry.get('controls' === 'mouse')) {
+            const pointerX = this.input.activePointer.x
+            const pointerY = this.input.activePointer.y
+
+            const deadZone = 10
+
+            if (pointerX < this.player.x - deadZone) {
+                this.player.setVelocityX(-speed)
+            } else if (pointerX > this.player.x + deadZone) {
+                this.player.setVelocityX(speed)
+            } else if (pointerY < this.player.y - deadZone) {
+                this.player.setVelocityY(-speed)
+            } else if (pointerY < this.player.y - deadZone) {
+                this.player.setVelocityY(speed)
+            } else {
+                this.player.setVelocity(0)
+            }
+        }
 
         // Horizontal movement
-        if (this.cursors.left.isDown) {
-            this.player.setVelocityX(-speed); // Move left
+        /* if (this.cursors.left.isDown) {
+            this.player.setVelocityX(-speed)
         } else if (this.cursors.right.isDown) {
-            this.player.setVelocityX(speed); // Move right
+            this.player.setVelocityX(speed)
         }
 
         // Vertical movement
         if (this.cursors.up.isDown) {
-            this.player.setVelocityY(-speed); // Move up
+            this.player.setVelocityY(-speed)
         } else if (this.cursors.down.isDown) {
-            this.player.setVelocityY(speed); // Move down
+            this.player.setVelocityY(speed)
         }
 
         // Optional: Normalize diagonal movement to prevent faster diagonal speed
         if (this.cursors.left.isDown || this.cursors.right.isDown || this.cursors.up.isDown || this.cursors.down.isDown) {
-            this.player.body.velocity.normalize().scale(speed);
-        }
+            this.player.body.velocity.normalize().scale(speed)
+        } */
     }
 
     collectChest(player, chest) {
