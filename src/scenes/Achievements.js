@@ -6,8 +6,8 @@ class Achievements extends Phaser.Scene {
     create() {
         this.add.text(100, 100, 'Achievements', { fontSize: '32px', fill: '#fff' })
 
+        // rework to display a leaderboard
         
-
         // back button
         let backButton = this.add.text(100, 300, 'Back to Menu', { 
             fontSize: '24px', 

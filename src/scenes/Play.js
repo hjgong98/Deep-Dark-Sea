@@ -118,13 +118,11 @@ class Play extends Phaser.Scene {
 
         this.cursors = this.input.keyboard.createCursorKeys()
 
-        /* this.timeLeft = 20
-        this.timerEvent = this.time.addEvent({
-            delay: 1000,
-            callback: this.updateTimer,
-            callbackScope: this,
-            loop: true
-        }) */
+        this.clock = this.time.delayedCall(2000, () => {
+            this.add.text(game.config.width / 2, game.config.height / 2, 'GAME OVER', scoreConfig).setOrigin(0.5)
+            this.add.text(game.config.width / 2, game.config.height / 2 + 64, 'Press (R) to Restart or <- for Menu', scoreConfig).setOrigin(0.5)
+            this.gameOver = true
+        }, null, this)
     }
 
     /* updateTimer() {
@@ -137,7 +135,7 @@ class Play extends Phaser.Scene {
         }
     }
 
-    showGameOverScreen() {
+    /* showGameOverScreen() {
         this.physics.pause() 
 
         const gameOverText = this.add.text(
@@ -227,25 +225,12 @@ class Play extends Phaser.Scene {
         if (this.cursors.left.isDown || this.cursors.right.isDown || this.cursors.up.isDown || this.cursors.down.isDown) {
             this.player.body.velocity.normalize().scale(speed);
         }
-
-        /* // check collisions
-        if(this.checkCollision(this.player, this.chest)){
-            // play chest open sound
-            this.sound.play('open chest')
-
-            // hide chest
-            this.chest.disableBody(true, true)
-
-            // this.score += random number between 25 and 50
-            this.score += Phaser.Math.Between(25, 50)
-
-            // this.chestfound += 1
-            this.chestfound += 1
-        } */
     }
 
     collectChest(player, chest) {
         this.sound.play('open chest', { loop: false, volume: 1 })
+
+        //save the coordinates
         const x = chest.x
         const y = chest.y
 
@@ -263,7 +248,7 @@ class Play extends Phaser.Scene {
         console.log(this.chestfound)
 
         // Re-enable the chest after 30 seconds
-        this.time.delayedCall(3000, () => {
+        this.time.delayedCall(30000, () => {
             const chest = this.physics.add.sprite(x, y, 'chest')
             chest.body.setImmovable(true)
             chest.body.setCollideWorldBounds(true)
