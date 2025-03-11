@@ -142,7 +142,7 @@ class Play extends Phaser.Scene {
             this.gameOver = true
         }, null, this) */
 
-        // Create the text object
+        // Create the text object -- edit it to keep track of the health of player sprite
         const text = this.add.text(0, 0, 'Your Text Here', {
             fontFamily: 'Arial',
             fontSize: '24px',
@@ -151,10 +151,33 @@ class Play extends Phaser.Scene {
         });
 
         // Fix the text to the camera
-        text.setScrollFactor(0); // This ensures the text doesn't move with the camera
+        text.setScrollFactor(0)
 
         // Position the text at the top-left corner of the camera
-        text.setPosition(this.cameras.main.worldView.x + 10, this.cameras.main.worldView.y + 10);
+        text.setPosition(this.cameras.main.worldView.x + 10, this.cameras.main.worldView.y + 10)
+
+        const timerConfig = {
+            fontFamily: 'Courier',
+            fontSize: '28px',
+            backgroundColor: '#F3B141',
+            color: '#843605',
+            align: 'right',
+            padding: {
+                top: 5,
+                bottom: 5
+            },
+            fixedWidth: 150
+        }
+
+        // Add timer text
+        this.timerText = this.add.text(game.config.width - borderUISize - borderPadding, borderUISize + borderPadding, 'Time: 60', timerConfig).setOrigin(1, 0)
+
+        // Set up the game timer
+        this.clock = this.time.delayedCall(60000, () => { // 60 seconds
+            this.gameOver = true
+            this.add.text(game.config.width / 2, game.config.height / 2, 'GAME OVER', timerConfig).setOrigin(0.5)
+            this.add.text(game.config.width / 2, game.config.height / 2 + 64, 'Press (R) to Restart or <- for Menu', timerConfig).setOrigin(0.5)
+        }, null, this)
     }
 
     /* updateTimer() {
@@ -231,9 +254,19 @@ class Play extends Phaser.Scene {
     }
 
     update() {
-        if (this.gameOver) return
-
-        //text.setOrigin(0, 0);
+        if (this.gameOver) {
+            // Check for restart or menu input
+            if (Phaser.Input.Keyboard.KeyCodes.R.isDown) {
+                this.scene.restart();
+            } else if (Phaser.Input.Keyboard.KeyCodes.LEFT.isDown) {
+                this.scene.start('menuScene');
+            }
+            return;
+        }
+    
+        // Update timer text
+        const remainingTime = Math.ceil(this.clock.getRemainingSeconds());
+        this.timerText.setText(`Time: ${remainingTime}`)
 
         // Player movement speed
         const speed = 200
