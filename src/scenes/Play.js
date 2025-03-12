@@ -29,24 +29,7 @@ class Play extends Phaser.Scene {
     create() {
         // Play underwater ambiance sound
         this.sound.play('underwater', { loop: true, volume: 1 })
-        const controlScheme = this.registry.get('controls') || 'arrows'
-
-        // Set up controls based on the selected scheme
-        if (controlScheme === 'wasd') {
-            this.cursors = this.input.keyboard.addKeys({
-                left: Phaser.Input.Keyboard.KeyCodes.A,
-                right: Phaser.Input.Keyboard.KeyCodes.D,
-                up: Phaser.Input.Keyboard.KeyCodes.W,
-                down: Phaser.Input.Keyboard.KeyCodes.S
-            })
-        } else if (controlScheme === 'arrows') {
-            this.cursors = this.input.keyboard.addKeys({
-                left: Phaser.Input.Keyboard.KeyCodes.LEFT,
-                right: Phaser.Input.Keyboard.KeyCodes.RIGHT,
-                up: Phaser.Input.Keyboard.KeyCodes.UP,
-                down: Phaser.Input.Keyboard.KeyCodes.DOWN
-            })
-        }
+        
 
         // tilemap stuff
         const map = this.add.tilemap('mapJSON')
@@ -127,6 +110,28 @@ class Play extends Phaser.Scene {
                     break
             }
         })
+        
+        // controls options
+        const controlScheme = this.registry.get('controls') || 'arrows'
+
+        // Set up controls based on the selected scheme
+        if (controlScheme === 'wasd') {
+            this.cursors = this.input.keyboard.addKeys({
+                left: Phaser.Input.Keyboard.KeyCodes.A,
+                right: Phaser.Input.Keyboard.KeyCodes.D,
+                up: Phaser.Input.Keyboard.KeyCodes.W,
+                down: Phaser.Input.Keyboard.KeyCodes.S
+            })
+        } else if (controlScheme === 'arrows') {
+            this.cursors = this.input.keyboard.addKeys({
+                left: Phaser.Input.Keyboard.KeyCodes.LEFT,
+                right: Phaser.Input.Keyboard.KeyCodes.RIGHT,
+                up: Phaser.Input.Keyboard.KeyCodes.UP,
+                down: Phaser.Input.Keyboard.KeyCodes.DOWN
+            })
+        } else if (controlScheme === 'mouse') {
+            // get the worldView x and y coordinates of the active pointer
+        }
 
         //set up camera to follow player
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
@@ -134,7 +139,7 @@ class Play extends Phaser.Scene {
 
         this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
 
-        this.cursors = this.input.keyboard.createCursorKeys()
+        // this.cursors = this.input.keyboard.createCursorKeys()
 
         /* this.clock = this.time.delayedCall(2000, () => {
             this.add.text(game.config.width / 2, game.config.height / 2, 'GAME OVER', scoreConfig).setOrigin(0.5)
@@ -143,19 +148,24 @@ class Play extends Phaser.Scene {
         }, null, this) */
 
         // Create the text object -- edit it to keep track of the health of player sprite
-        const text = this.add.text(0, 0, 'Your Text Here', {
+        const healthtext = this.add.text(0, 0, 'player health sprite text', {
             fontFamily: 'Arial',
             fontSize: '24px',
             fill: '#ffffff',
             backgroundColor: '#000000'
-        });
+        })
 
         // Fix the text to the camera
-        text.setScrollFactor(0)
+        healthtext.setScrollFactor(0)
 
         // Position the text at the top-left corner of the camera
-        text.setPosition(this.cameras.main.worldView.x + 10, this.cameras.main.worldView.y + 10)
+        healthtext.setPosition(this.cameras.main.worldView.x + 10, this.cameras.main.worldView.y + 10)
+        
+        // add a text object to keep track of points and chests collected
+        // text to upper left to keep track of seconds left
+        // maybe also add a interactable button to go directly back to main menu
 
+        // fix timer
         const timerConfig = {
             fontFamily: 'Courier',
             fontSize: '28px',
@@ -173,7 +183,7 @@ class Play extends Phaser.Scene {
         this.timerText = this.add.text(game.config.width - borderUISize - borderPadding, borderUISize + borderPadding, 'Time: 60', timerConfig).setOrigin(1, 0)
 
         // Set up the game timer
-        this.clock = this.time.delayedCall(60000, () => { // 60 seconds
+        this.clock = this.time.delayedCall(60000, () => { // 60 seconds -- change to longer later on
             this.gameOver = true
             this.add.text(game.config.width / 2, game.config.height / 2, 'GAME OVER', timerConfig).setOrigin(0.5)
             this.add.text(game.config.width / 2, game.config.height / 2 + 64, 'Press (R) to Restart or <- for Menu', timerConfig).setOrigin(0.5)
@@ -257,11 +267,11 @@ class Play extends Phaser.Scene {
         if (this.gameOver) {
             // Check for restart or menu input
             if (Phaser.Input.Keyboard.KeyCodes.R.isDown) {
-                this.scene.restart();
+                this.scene.restart()
             } else if (Phaser.Input.Keyboard.KeyCodes.LEFT.isDown) {
-                this.scene.start('menuScene');
+                this.scene.start('menuScene')
             }
-            return;
+            return
         }
     
         // Update timer text
@@ -291,25 +301,10 @@ class Play extends Phaser.Scene {
             if (this.cursors.left.isDown || this.cursors.right.isDown || this.cursors.up.isDown || this.cursors.down.isDown) {
                 this.player.body.velocity.normalize().scale(speed)
             }
-        }
+        } else {
+            // mouse controls
 
-        if (this.registry.get('controls' === 'mouse')) {
-            const pointerX = this.input.activePointer.x
-            const pointerY = this.input.activePointer.y
-
-            const deadZone = 10
-
-            if (pointerX < this.player.x - deadZone) {
-                this.player.setVelocityX(-speed)
-            } else if (pointerX > this.player.x + deadZone) {
-                this.player.setVelocityX(speed)
-            } else if (pointerY < this.player.y - deadZone) {
-                this.player.setVelocityY(-speed)
-            } else if (pointerY < this.player.y - deadZone) {
-                this.player.setVelocityY(speed)
-            } else {
-                this.player.setVelocity(0)
-            }
+            // if mouse is clicked move player to that location
         }
 
         // Horizontal movement
