@@ -3,8 +3,15 @@ class Controls extends Phaser.Scene {
         super("Controls")
     }
 
+    preload () {
+        // load images
+        this.load.image('background', './assets/background.png')
+    }
+
     create() {
         this.add.text(100, 100, 'Instructions', { fontSize: '32px', fill: '#fff' })
+
+        this.background = this.add.tileSprite(0, 0, 800, 600, 'background').setOrigin(0,0)
 
         // Control options
         let wasdOption = this.add.text(100, 200, 'WASD', { fontSize: '24px', fill: '#fff' }).setInteractive()

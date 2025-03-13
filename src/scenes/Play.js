@@ -29,7 +29,6 @@ class Play extends Phaser.Scene {
     create() {
         // Play underwater ambiance sound
         this.sound.play('underwater', { loop: true, volume: 1 })
-        
 
         // tilemap stuff
         const map = this.add.tilemap('mapJSON')
@@ -110,7 +109,7 @@ class Play extends Phaser.Scene {
                     break
             }
         })
-        
+
         // controls options
         const controlScheme = this.registry.get('controls') || 'arrows'
 
@@ -130,7 +129,8 @@ class Play extends Phaser.Scene {
                 down: Phaser.Input.Keyboard.KeyCodes.DOWN
             })
         } else if (controlScheme === 'mouse') {
-            // get the worldView x and y coordinates of the active pointer
+            // Initialize mouse target position
+            this.mouseTarget = null
         }
 
         //set up camera to follow player
@@ -302,9 +302,27 @@ class Play extends Phaser.Scene {
                 this.player.body.velocity.normalize().scale(speed)
             }
         } else {
-            // mouse controls
+            const pointer = this.input.activePointer
 
-            // if mouse is clicked move player to that location
+            if (pointer.isDown) {
+                this.mouseTarget = { x: pointer.worldView.x, y: pointer.worldView.y }
+            }
+
+            if (this.mouseTarget) {
+                const speed = 200
+                const direction = new Phaser.Math.Vector2(
+                    this.mouseTarget.x - this.player.x,
+                    this.mouseTarget.y - this.player.y
+                )
+                
+                this.player.setVelocity(direction.x * speed, direction.y * speed)
+
+                const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.mouseTarget.x, this.mouseTarget.y)
+                if (distance < 10) {
+                    this.player.setVelocity(0, 0)
+                    this.mouseTarget = null // Clear the target
+                }
+            }
         }
 
         // Horizontal movement
