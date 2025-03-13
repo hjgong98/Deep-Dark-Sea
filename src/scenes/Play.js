@@ -205,14 +205,13 @@ class Play extends Phaser.Scene {
             fixedWidth: 150
         }
 
-        // Add timer text
-        this.timerText = this.add.text(game.config.width - borderUISize - borderPadding, borderUISize + borderPadding, 'Time: 60', timerConfig).setOrigin(1, 0)
+        this.timerText = this.add.text(0, 0, 'Time: 60', timerConfig)
+        this.timerText.setScrollFactor(0)
+        this.timerText.setPosition(this.cameras.main.worldView.x + 10, this.cameras.main.worldView.y + 100)
 
         // Set up the game timer
         this.clock = this.time.delayedCall(60000, () => { // 60 seconds -- change to longer later on
-            this.gameOver = true
-            this.add.text(game.config.width / 2, game.config.height / 2, 'GAME OVER', timerConfig).setOrigin(0.5)
-            this.add.text(game.config.width / 2, game.config.height / 2 + 64, 'Press (R) to Restart or <- for Menu', timerConfig).setOrigin(0.5)
+            this.endGame()
         }, null, this)
     }
 
@@ -234,14 +233,93 @@ class Play extends Phaser.Scene {
         })
     }
 
+    endGame() {
+        this.gameOver = true
+
+        // Freeze all sprites and physics
+        this.physics.pause()
+
+        // game over text
+        const gameOverText = this.add.text(
+            this.cameras.main.worldView.x + this.cameras.main.width / 2,
+            this.cameras.main.worldView.y + this.cameras.main.height / 2,
+            'GAME OVER', {
+                fontFamily: 'Arial',
+                fontSize: '64px',
+                fill: '#ff0000',
+                backgroundColor: '#000000'
+            }
+        ).setOrigin(0.5)
+
+        // restart button
+        const restartButton = this.add.text(
+            this.cameras.main.worldView.x + this.cameras.main.width / 2,
+            this.cameras.main.worldView.y + this.cameras.main.height / 2 + 64,
+            'Restart', {
+                fontFamily: 'Arial',
+                fontSize: '32px',
+                fill: '#ff0000',
+                backgroundColor: '#000000',
+                padding: { x: 10, y: 5 }
+            }
+        ).setOrigin(0.5).setInteractive()
+
+        // add hover effect
+        restartButton.on('pointerover', () => {
+            restartButton.setBackgroundColor('#555555')
+        })
+        restartButton.on('pointerout', () => {
+            restartButton.setBackgroundColor('#000000')
+        })
+        restartButton.on('pointerdown', () => {
+            this.scene.restart()
+        })
+
+        // create menu button
+        const menuButton = this.add.text(
+            this.cameras.main.worldView.x + this.cameras.main.width / 2,
+            this.cameras.main.worldView.y + this.cameras.main.height / 2 + 128,
+            'Back to Menu', {
+                fontFamily: 'Arial',
+                fontSize: '32px',
+                fill: '#ff0000',
+                backgroundColor: '#000000',
+                padding: { x: 10, y: 5 }
+            }
+        ).setOrigin(0.5).setInteractive()
+
+        // add hover effect
+        menuButton.on('pointerover', () => {
+            menuButton.setBackgroundColor('#555555')
+        })
+        menuButton.on('pointerout', () => {
+            menuButton.setBackgroundColor('#000000')
+        })
+        menuButton.on('pointerdown', () => {
+            this.scene.start('Menu')
+        })
+    }
+
+    setupRandomMovement(sprite) {
+        // Random movement logic (same as before)
+        this.time.addEvent({
+            delay: Phaser.Math.Between(1000, 3000),
+            callback: () => {
+                const directions = [
+                    { x: 1, y: 0 },   // Right
+                    { x: -1, y: 0 },  // Left
+                    { x: 0, y: 1 },   // Down
+                    { x: 0, y: -1 }   // Up
+                ]
+                const direction = Phaser.Utils.Array.GetRandom(directions)
+                sprite.setVelocity(direction.x * 100, direction.y * 100)
+            },
+            loop: true
+        })
+    }
+
     update() {
         if (this.gameOver) {
-            // Check for restart or menu input
-            if (Phaser.Input.Keyboard.KeyCodes.R.isDown) {
-                this.scene.restart()
-            } else if (Phaser.Input.Keyboard.KeyCodes.LEFT.isDown) {
-                this.scene.start('menuScene')
-            }
             return
         }
     
