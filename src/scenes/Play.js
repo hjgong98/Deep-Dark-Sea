@@ -162,6 +162,32 @@ class Play extends Phaser.Scene {
         healthtext.setPosition(this.cameras.main.worldView.x + 10, this.cameras.main.worldView.y + 10)
         
         // add a text object to keep track of points and chests collected
+        const pointstext = this.add.text(0, 0, 'Points: 0', {
+            fontFamily: 'Arial',
+            fontSize: '24px',
+            fill: '#ffffff',
+            backgroundColor: '#000000'
+        })
+
+        // Fix the text to the camera
+        pointstext.setScrollFactor(0)
+
+        // Position the text at the top-left corner of the camera
+        pointstext.setPosition(this.cameras.main.worldView.x + 10, this.cameras.main.worldView.y + 40)
+
+        const cheststext = this.add.text(0, 0, 'Chests: 0', {
+            fontFamily: 'Arial',
+            fontSize: '24px',
+            fill: '#ffffff',
+            backgroundColor: '#000000'
+        })
+
+        // Fix the text to the camera
+        cheststext.setScrollFactor(0)
+
+        // Position the text at the top-left corner of the camera
+        cheststext.setPosition(this.cameras.main.worldView.x + 10, this.cameras.main.worldView.y + 70)
+
         // text to upper left to keep track of seconds left
         // maybe also add a interactable button to go directly back to main menu
 
@@ -189,61 +215,6 @@ class Play extends Phaser.Scene {
             this.add.text(game.config.width / 2, game.config.height / 2 + 64, 'Press (R) to Restart or <- for Menu', timerConfig).setOrigin(0.5)
         }, null, this)
     }
-
-    /* updateTimer() {
-        this.timeLeft--
-        
-        if (this.timeLeft === 0) {
-            this.timerEvent.remove()
-            this.gameOver = true
-            this.showGameOverScreen()
-        }
-    }
-
-    /* showGameOverScreen() {
-        this.physics.pause() 
-
-        const gameOverText = this.add.text(
-            this.cameras.main.centerX, 
-            this.cameras.main.centerY - 100,
-            'Game Over',
-            {
-                fontSize: '64px',
-                fill: '#ff0000',
-                fontStyle: 'bold'
-            }
-        ).setOrigin(0.5)
-
-        const resetButton = this.add.text(
-            this.cameras.main.centerX,
-            this.cameras.main.centerY,
-            'Reset',
-            {
-                fontSize: '32px',
-                fill: '#00ff00',
-                fontStyle: 'bold'
-            }
-        ).setOrigin(0.5).setInteractive()
-
-        resetButton.on('pointerdown', () => {
-            this.scene.restart()
-        })
-
-        const menuButton = this.add.text(
-            this.cameras.main.centerX,
-            this.cameras.main.centerY + 100,
-            'Back to Menu',
-            {
-                fontSize: '32px',
-                fill: '#00ff00',
-                fontSytle: 'bold'
-            }
-        ).setOrigin(0.5).setInteractive()
-
-        menuButton.on('pointerdown', () => {
-            this.scene.start('Menu')
-        })
-    } */
 
     setupRandomMovement(sprite) {
         // Random movement logic
@@ -320,29 +291,10 @@ class Play extends Phaser.Scene {
                 const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.mouseTarget.x, this.mouseTarget.y)
                 if (distance < 10) {
                     this.player.setVelocity(0, 0)
-                    this.mouseTarget = null // Clear the target
+                    this.mouseTarget = null
                 }
             }
         }
-
-        // Horizontal movement
-        /* if (this.cursors.left.isDown) {
-            this.player.setVelocityX(-speed)
-        } else if (this.cursors.right.isDown) {
-            this.player.setVelocityX(speed)
-        }
-
-        // Vertical movement
-        if (this.cursors.up.isDown) {
-            this.player.setVelocityY(-speed)
-        } else if (this.cursors.down.isDown) {
-            this.player.setVelocityY(speed)
-        }
-
-        // Optional: Normalize diagonal movement to prevent faster diagonal speed
-        if (this.cursors.left.isDown || this.cursors.right.isDown || this.cursors.up.isDown || this.cursors.down.isDown) {
-            this.player.body.velocity.normalize().scale(speed)
-        } */
     }
 
     collectChest(player, chest) {
