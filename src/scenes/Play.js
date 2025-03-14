@@ -93,6 +93,7 @@ class Play extends Phaser.Scene {
                     this.physics.add.collider(squidb, mazeLayer)
                     // player loses health when colliding with squidb
                     this.physics.add.collider(this.player, squidb, this.handleCreatureCOllision, null, this)
+                    this.physics.add.collider(this.player, squidb, this.handleCreatureCOllision, null, this)
                     // Add random movement logic for squidb here
                     this.setupRandomMovement(squidb)
                     break
