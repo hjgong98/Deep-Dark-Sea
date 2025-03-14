@@ -69,7 +69,7 @@ class Play extends Phaser.Scene {
                     octopus.body.setCollideWorldBounds(true)
                     this.physics.add.collider(octopus, mazeLayer)
                     // player loses health when colliding with octopus
-                    this.physics.add.collider(octopus, this.player, this.handleCreatureCOllision, null, this)
+                    this.physics.add.collider(this.player, octopus, this.handleCreatureCOllision, null, this)
                     // Add random movement logic for octopus here
                     this.setupRandomMovement(octopus)
                     break
@@ -80,7 +80,7 @@ class Play extends Phaser.Scene {
                     squida.body.setCollideWorldBounds(true)
                     this.physics.add.collider(squida, mazeLayer)
                     // player loses health when colliding with squida
-                    this.physics.add.collider(squida, this.player, this.handleCreatureCOllision, null, this)
+                    this.physics.add.collider(this.player, squida, this.handleCreatureCOllision, null, this)
                     // Add random movement logic for squida here
                     this.setupRandomMovement(squida)
                     break
@@ -91,7 +91,7 @@ class Play extends Phaser.Scene {
                     squidb.body.setCollideWorldBounds(true)
                     this.physics.add.collider(squidb, mazeLayer)
                     // player loses health when colliding with squidb
-                    this.physics.add.collider(squidb, this.player, this.handleCreatureCOllision, null, this)
+                    this.physics.add.collider(this.playersquidb, this.handleCreatureCOllision, null, this)
                     // Add random movement logic for squidb here
                     this.setupRandomMovement(squidb)
                     break
