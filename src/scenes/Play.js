@@ -209,7 +209,10 @@ class Play extends Phaser.Scene {
 
         this.timerText = this.add.text(0, 0, 'Time: 120', timerConfig)
         this.timerText.setScrollFactor(0)
-        this.timerText.setPosition(this.cameras.main.worldView.x + 10, this.cameras.main.worldView.y + 100)
+        this.timerText.setPosition(
+            this.cameras.main.worldView.x + this.cameras.main.width - this.timerText.width - 10, // X position (right-aligned)
+            this.cameras.main.worldView.y + 10 // Y position (top-aligned)
+        )
 
         // Set up the game timer
         this.clock = this.time.delayedCall(120000, () => { // 120 seconds -- change to longer later on
@@ -257,10 +260,12 @@ class Play extends Phaser.Scene {
         // retrieve best score and most chests from registry
         const bestScore = this.registry.get('bestScore') || 0
         const mostChests = this.registry.get('mostChests') || 0
+        const sameGame = this.registry.get('sameGame') || false
 
         // check if there are new high scores
         const isNewHighScore = this.score > bestScore
         const isNewMostChests = this.chestfound > mostChests
+        this.registry.set('sameGame', (isNewHighScore && isNewMostChests))
 
         if(isNewHighScore) {
             this.registry.set('bestScore', this.score)

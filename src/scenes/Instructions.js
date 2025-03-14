@@ -9,10 +9,10 @@ class Instructions extends Phaser.Scene {
     }
 
     create() {
+        this.background = this.add.tileSprite(0, 0, 800, 600, 'background').setOrigin(0,0)
+        
         // title
         this.add.text(100, 100, 'Instructions', { fontSize: '32px', fill: '#fff' })
-
-        this.background = this.add.tileSprite(0, 0, 800, 600, 'background').setOrigin(0,0)
 
         // get selected contol scheme from registry
         const controlScheme = this.registry.get('controls') || 'arrows' // Default to 'wasd' if none selected

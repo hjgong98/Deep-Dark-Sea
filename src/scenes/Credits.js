@@ -9,9 +9,9 @@ class Credits extends Phaser.Scene {
     }
 
     create() {
-        this.add.text(100, 100, 'Credits', { fontSize: '32px', fill: '#fff' })
-
         this.background = this.add.tileSprite(0, 0, 800, 600, 'background').setOrigin(0,0)
+
+        this.add.text(100, 100, 'Credits', { fontSize: '32px', fill: '#fff' })
 
         this.add.text(100, 150, 'background images drawn by me', {fontSize: '12px', fill: '#fff'})
         this.add.text(100, 200, 'sprites were drawn by me', {fontSize: '12px', fill: '#fff'})

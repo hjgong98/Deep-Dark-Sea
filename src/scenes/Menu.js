@@ -9,11 +9,12 @@ class Menu extends Phaser.Scene {
     }
 
     create() {
+        // menu background
+        this.background = this.add.tileSprite(0, 0, 800, 600, 'background').setOrigin(0,0)
+        
         // menu UI
         this.add.text(100, 100, 'Main Menu', { fontSize: '32px', fill: '#fff' })
 
-        // menu background
-        this.background = this.add.tileSprite(0, 0, 800, 600, 'background').setOrigin(0,0)
 
         // go to controls scene
         let controlsButton = this.add.text(100, 175, 'Choose Controls', { 
@@ -32,11 +33,11 @@ class Menu extends Phaser.Scene {
         })
 
         // go to sprite scene
-        let spritesButton = this.add.text(100, 255, 'Choose Sprite', { 
+        let spritesButton = this.add.text(100, 255, 'Objectives', { 
             fontSize: '24px', 
             fill: '#fff' 
         }).setInteractive().on('pointerdown', () => {
-            this.scene.start('Sprites')
+            this.scene.start('Objectives')
         })
 
         // go to play scene

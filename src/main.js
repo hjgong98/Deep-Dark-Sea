@@ -9,7 +9,7 @@ let config = {
         }
     },
     zoom: 2,
-    scene: [ Menu, Controls, Instructions, Sprites, Play, Achievements, Credits ]
+    scene: [ Menu, Controls, Instructions, Objectives, Play, Achievements, Credits ]
 }
 
 let game = new Phaser.Game(config)
@@ -23,5 +23,5 @@ let borderPadding = borderUISize / 3
 // sea creature and player interaction
 // sea creature and player sound effect  -- done
 // save highest chest collected count and highest points scored in a single round -- done
-// check for new high scores and if both are new high scores, ask for name to display on leaderboard
+// check for new high scores and if both are new high scores, ask for name to display on leaderboard -- screw the leaderboard
 // spinning coin that adds health
