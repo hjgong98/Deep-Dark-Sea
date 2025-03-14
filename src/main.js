@@ -21,7 +21,7 @@ let borderPadding = borderUISize / 3
 // things to do: (remove once done)
 // timer
 // sea creature and player interaction
-// sea creature and player sound effect
-// save highest chest collected count and highest points scored in a single round 
+// sea creature and player sound effect  -- done
+// save highest chest collected count and highest points scored in a single round -- done
 // check for new high scores and if both are new high scores, ask for name to display on leaderboard
 // spinning coin that adds health

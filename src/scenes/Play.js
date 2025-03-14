@@ -24,6 +24,7 @@ class Play extends Phaser.Scene {
         // load sound
         this.load.audio('underwater', 'assets/underwater ambiance.wav')
         this.load.audio('open chest', 'assets/open chest.wav')
+        this.load.audio('dull thud', 'assets/dull thud.wav')
     }
 
     create() {
@@ -68,7 +69,7 @@ class Play extends Phaser.Scene {
                     octopus.body.setCollideWorldBounds(true)
                     this.physics.add.collider(octopus, mazeLayer)
                     // player loses health when colliding with octopus
-                    this.physics.add.collider(octopus, this.player)
+                    this.physics.add.collider(octopus, this.player, this.handleCreatureCOllision, null, this)
                     // Add random movement logic for octopus here
                     this.setupRandomMovement(octopus)
                     break
@@ -79,7 +80,7 @@ class Play extends Phaser.Scene {
                     squida.body.setCollideWorldBounds(true)
                     this.physics.add.collider(squida, mazeLayer)
                     // player loses health when colliding with squida
-                    this.physics.add.collider(squida, this.player)
+                    this.physics.add.collider(squida, this.player, this.handleCreatureCOllision, null, this)
                     // Add random movement logic for squida here
                     this.setupRandomMovement(squida)
                     break
@@ -90,7 +91,7 @@ class Play extends Phaser.Scene {
                     squidb.body.setCollideWorldBounds(true)
                     this.physics.add.collider(squidb, mazeLayer)
                     // player loses health when colliding with squidb
-                    this.physics.add.collider(squidb, this.player)
+                    this.physics.add.collider(squidb, this.player, this.handleCreatureCOllision, null, this)
                     // Add random movement logic for squidb here
                     this.setupRandomMovement(squidb)
                     break
@@ -234,16 +235,44 @@ class Play extends Phaser.Scene {
         })
     }
 
+    handleCreatureCollision(player, creature) {
+        this.sound.play('dull thud', { volume: 1})
+
+        // reduce player health
+        player.health -= 1
+        this.healthtext.setText(`Health: ${player.health}`)
+
+        // check if health is depleted
+        if (player.health <= 0) {
+            this.endGame()
+        }
+    }
+
     endGame() {
         this.gameOver = true
 
         // Freeze all sprites and physics
         this.physics.pause()
 
+        // retrieve best score and most chests from registry
+        const bestScore = this.registry.get('bestScore') || 0
+        const mostChests = this.registry.get('mostChests') || 0
+
+        // check if there are new high scores
+        const isNewHighScore = this.score > bestScore
+        const isNewMostChests = this.chestfound > mostChests
+
+        if(isNewHighScore) {
+            this.registry.set('bestScore', this.score)
+        }
+        if (isNewMostChests) {
+            this.registry.set('mostChests', this.chestfound)
+        }
+
         // game over text
         const gameOverText = this.add.text(
             this.cameras.main.worldView.x + this.cameras.main.width / 2,
-            this.cameras.main.worldView.y + this.cameras.main.height / 2,
+            this.cameras.main.worldView.y + this.cameras.main.height / 2 - 100,
             'GAME OVER', {
             fontFamily: 'Arial',
             fontSize: '64px',
@@ -252,10 +281,75 @@ class Play extends Phaser.Scene {
         }
         ).setOrigin(0.5)
 
+        // display high scores if applicable
+        if (isNewHighScore && isNewMostChests) {
+            this.add.text(
+                this.cameras.main.worldView.x + this.cameras.main.width / 2,
+                this.cameras.main.worldView.y + this.cameras.main.height / 2,
+                'Congrats! Both scores are high scores!', {
+                    fontFamily: 'Arial',
+                    fontSize: '32px',
+                    fill: '#00ff00',
+                    backgroundColor: '#000000',
+                    align: 'center'
+                }
+            ).setOrigin(0.5)
+        } else if (isNewHighScore) {
+            this.add.text(
+                this.cameras.main.worldView.x + this.cameras.main.width / 2,
+                this.cameras.main.worldView.y + this.main.cameras.main.height / 2,
+                'You got the new high score!', {
+                    fontFamily: 'Arial',
+                    fontSize: '32px',
+                    fill: '#00ff00',
+                    backgroundColor: '#000000',
+                    align: 'center'
+                }
+            ).setOrigin(0.5)
+        } else if (isNewMostChests) {
+            this.add.text(
+                this.cameras.main.worldView.x + this.cameras.main.width / 2,
+                this.cameras.main.worldView.y + this.cameras.main.height / 2,
+                'You found the most chests!', {
+                    fontFamily: 'Arial', 
+                    fontSize: '32px',
+                    fill: '#00ff00',
+                    backgroundColor: '#000000',
+                    align: 'center'
+                }
+            ).setOrigin(0.5)
+        }
+
+        // display current and best score
+        this.add.text(
+            this.cameras.main.worldView.x + this.cameras.main.width / 2,
+            this.cameras.main.worldView.y + this.cameras.main.height / 2 + 50,
+            `Score: ${this.score} | Best Score: ${this.registry.get('bestScore')}`, {
+                fontFamily: 'Arial',
+                fontSize: '24px',
+                fill: '#ffffff',
+                backgroundColor: '#000000',
+                align: 'center'
+            }
+        ).setOrigin(0.5)
+
+        // display current and most chests
+        this.add.text(
+            this.cameras.main.worldView.x + this.cameras.main.width / 2,
+            this.cameras.main.worldView.y + this.cameras.main.height / 2 + 100,
+            `Chests Found: ${this.chestfound} | Most Chests: ${this.registry.get('mostChests')}`, {
+                fontFamily: 'Arial',
+                fontSize: '24px',
+                fill: '#ffffff',
+                backgroundColor: '#000000',
+                align: 'center'
+            }
+        ).setOrigin(0.5)
+
         // restart button
         const restartButton = this.add.text(
             this.cameras.main.worldView.x + this.cameras.main.width / 2,
-            this.cameras.main.worldView.y + this.cameras.main.height / 2 + 64,
+            this.cameras.main.worldView.y + this.cameras.main.height / 2 + 150,
             'Restart', {
             fontFamily: 'Arial',
             fontSize: '32px',
@@ -279,7 +373,7 @@ class Play extends Phaser.Scene {
         // create menu button
         const menuButton = this.add.text(
             this.cameras.main.worldView.x + this.cameras.main.width / 2,
-            this.cameras.main.worldView.y + this.cameras.main.height / 2 + 128,
+            this.cameras.main.worldView.y + this.cameras.main.height / 2 + 200,
             'Back to Menu', {
             fontFamily: 'Arial',
             fontSize: '32px',
@@ -381,7 +475,7 @@ class Play extends Phaser.Scene {
             }
         }
 
-        // Check for collisions between player and sea creatures
+        /* // Check for collisions between player and sea creatures
         if (this.checkCollision(this.player, this.octopus)) {
             this.player.health -= 1
             this.healthtext.setText(`Health: ${this.player.health}`)
@@ -395,10 +489,12 @@ class Play extends Phaser.Scene {
             this.healthtext.setText(`Health: ${this.player.health}`)
         }
 
+        console.log(this.player.health)
+
         // Check if player health is 0
         if (this.player.health <= 0) {
             this.endGame();
-        }
+        } */
     }
 
     collectChest(player, chest) {
@@ -433,7 +529,7 @@ class Play extends Phaser.Scene {
         })
     }
 
-    checkCollision(player, creature) {
+    /* checkCollision(player, creature) {
         return this.physics.overlap(player, creature)
-    }
+    } */
 }
