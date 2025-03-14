@@ -59,6 +59,7 @@ class Play extends Phaser.Scene {
                     this.player = this.physics.add.sprite(obj.x, obj.y, 'player')
                     this.player.body.setCollideWorldBounds(true)
                     this.physics.add.collider(this.player, mazeLayer)
+                    this.player.health = 10
                     break
 
                 case 'octopus':
@@ -148,7 +149,7 @@ class Play extends Phaser.Scene {
         }, null, this) */
 
         // Create the text object -- edit it to keep track of the health of player sprite
-        const healthtext = this.add.text(0, 0, 'player health sprite text', {
+        this.healthtext = this.add.text(0, 0, `Health: ${this.player.health}`, {
             fontFamily: 'Arial',
             fontSize: '24px',
             fill: '#ffffff',
@@ -156,13 +157,13 @@ class Play extends Phaser.Scene {
         })
 
         // Fix the text to the camera
-        healthtext.setScrollFactor(0)
+        this.healthtext.setScrollFactor(0)
 
         // Position the text at the top-left corner of the camera
-        healthtext.setPosition(this.cameras.main.worldView.x + 10, this.cameras.main.worldView.y + 10)
-        
+        this.healthtext.setPosition(this.cameras.main.worldView.x + 10, this.cameras.main.worldView.y + 10)
+
         // add a text object to keep track of points and chests collected
-        const pointstext = this.add.text(0, 0, 'Points: 0', {
+        this.pointstext = this.add.text(0, 0, `Points ${this.score}`, {
             fontFamily: 'Arial',
             fontSize: '24px',
             fill: '#ffffff',
@@ -170,12 +171,12 @@ class Play extends Phaser.Scene {
         })
 
         // Fix the text to the camera
-        pointstext.setScrollFactor(0)
+        this.pointstext.setScrollFactor(0)
 
         // Position the text at the top-left corner of the camera
-        pointstext.setPosition(this.cameras.main.worldView.x + 10, this.cameras.main.worldView.y + 40)
+        this.pointstext.setPosition(this.cameras.main.worldView.x + 10, this.cameras.main.worldView.y + 40)
 
-        const cheststext = this.add.text(0, 0, 'Chests: 0', {
+        this.cheststext = this.add.text(0, 0, `Chests: ${this.chestfound}`, {
             fontFamily: 'Arial',
             fontSize: '24px',
             fill: '#ffffff',
@@ -183,10 +184,10 @@ class Play extends Phaser.Scene {
         })
 
         // Fix the text to the camera
-        cheststext.setScrollFactor(0)
+        this.cheststext.setScrollFactor(0)
 
         // Position the text at the top-left corner of the camera
-        cheststext.setPosition(this.cameras.main.worldView.x + 10, this.cameras.main.worldView.y + 70)
+        this.cheststext.setPosition(this.cameras.main.worldView.x + 10, this.cameras.main.worldView.y + 70)
 
         // text to upper left to keep track of seconds left
         // maybe also add a interactable button to go directly back to main menu
@@ -205,12 +206,12 @@ class Play extends Phaser.Scene {
             fixedWidth: 150
         }
 
-        this.timerText = this.add.text(0, 0, 'Time: 60', timerConfig)
+        this.timerText = this.add.text(0, 0, 'Time: 120', timerConfig)
         this.timerText.setScrollFactor(0)
         this.timerText.setPosition(this.cameras.main.worldView.x + 10, this.cameras.main.worldView.y + 100)
 
         // Set up the game timer
-        this.clock = this.time.delayedCall(60000, () => { // 60 seconds -- change to longer later on
+        this.clock = this.time.delayedCall(120000, () => { // 120 seconds -- change to longer later on
             this.endGame()
         }, null, this)
     }
@@ -244,11 +245,11 @@ class Play extends Phaser.Scene {
             this.cameras.main.worldView.x + this.cameras.main.width / 2,
             this.cameras.main.worldView.y + this.cameras.main.height / 2,
             'GAME OVER', {
-                fontFamily: 'Arial',
-                fontSize: '64px',
-                fill: '#ff0000',
-                backgroundColor: '#000000'
-            }
+            fontFamily: 'Arial',
+            fontSize: '64px',
+            fill: '#ff0000',
+            backgroundColor: '#000000'
+        }
         ).setOrigin(0.5)
 
         // restart button
@@ -256,12 +257,12 @@ class Play extends Phaser.Scene {
             this.cameras.main.worldView.x + this.cameras.main.width / 2,
             this.cameras.main.worldView.y + this.cameras.main.height / 2 + 64,
             'Restart', {
-                fontFamily: 'Arial',
-                fontSize: '32px',
-                fill: '#ff0000',
-                backgroundColor: '#000000',
-                padding: { x: 10, y: 5 }
-            }
+            fontFamily: 'Arial',
+            fontSize: '32px',
+            fill: '#ff0000',
+            backgroundColor: '#000000',
+            padding: { x: 10, y: 5 }
+        }
         ).setOrigin(0.5).setInteractive()
 
         // add hover effect
@@ -280,12 +281,12 @@ class Play extends Phaser.Scene {
             this.cameras.main.worldView.x + this.cameras.main.width / 2,
             this.cameras.main.worldView.y + this.cameras.main.height / 2 + 128,
             'Back to Menu', {
-                fontFamily: 'Arial',
-                fontSize: '32px',
-                fill: '#ff0000',
-                backgroundColor: '#000000',
-                padding: { x: 10, y: 5 }
-            }
+            fontFamily: 'Arial',
+            fontSize: '32px',
+            fill: '#ff0000',
+            backgroundColor: '#000000',
+            padding: { x: 10, y: 5 }
+        }
         ).setOrigin(0.5).setInteractive()
 
         // add hover effect
@@ -322,7 +323,7 @@ class Play extends Phaser.Scene {
         if (this.gameOver) {
             return
         }
-    
+
         // Update timer text
         const remainingTime = Math.ceil(this.clock.getRemainingSeconds());
         this.timerText.setText(`Time: ${remainingTime}`)
@@ -354,24 +355,49 @@ class Play extends Phaser.Scene {
             const pointer = this.input.activePointer
 
             if (pointer.isDown) {
-                this.mouseTarget = { x: pointer.worldView.x, y: pointer.worldView.y }
+                //this.mouseTarget = { x: pointer.worldX, y: pointer.worldY }
+                this.mouseTarget = this.cameras.main.getWorldPoint(pointer.x, pointer.y)
             }
 
             if (this.mouseTarget) {
-                const speed = 200
+                // Calculate direction vector
                 const direction = new Phaser.Math.Vector2(
                     this.mouseTarget.x - this.player.x,
                     this.mouseTarget.y - this.player.y
-                )
-                
-                this.player.setVelocity(direction.x * speed, direction.y * speed)
+                );
 
+                // Normalize the direction vector and scale it by speed
+                direction.normalize().scale(speed);
+
+                // Set player velocity
+                this.player.setVelocity(direction.x, direction.y)
+
+                // Stop the player when close to the target
                 const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.mouseTarget.x, this.mouseTarget.y)
                 if (distance < 10) {
-                    this.player.setVelocity(0, 0)
-                    this.mouseTarget = null
+                    this.player.setVelocity(0, 0);
+                    this.mouseTarget = null;
                 }
             }
+        }
+
+        // Check for collisions between player and sea creatures
+        if (this.checkCollision(this.player, this.octopus)) {
+            this.player.health -= 1
+            this.healthtext.setText(`Health: ${this.player.health}`)
+        }
+        if (this.checkCollision(this.player, this.squida)) {
+            this.player.health -= 1
+            this.healthtext.setText(`Health: ${this.player.health}`)
+        }
+        if (this.checkCollision(this.player, this.squidb)) {
+            this.player.health -= 1
+            this.healthtext.setText(`Health: ${this.player.health}`)
+        }
+
+        // Check if player health is 0
+        if (this.player.health <= 0) {
+            this.endGame();
         }
     }
 
@@ -391,9 +417,11 @@ class Play extends Phaser.Scene {
 
         this.score += Phaser.Math.Between(25, 50)
         console.log(this.score)
+        this.pointstext.setText(`Points: ${this.score}`)
 
         this.chestfound += 1
         console.log(this.chestfound)
+        this.cheststext.setText(`Chests: ${this.chestfound}`)
 
         // Re-enable the chest after 30 seconds
         this.time.delayedCall(30000, () => {
@@ -403,5 +431,9 @@ class Play extends Phaser.Scene {
             // add collect chest interaction here
             this.physics.add.overlap(this.player, chest, this.collectChest, null, this)
         })
+    }
+
+    checkCollision(player, creature) {
+        return this.physics.overlap(player, creature)
     }
 }
