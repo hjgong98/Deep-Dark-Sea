@@ -61,6 +61,7 @@ class Play extends Phaser.Scene {
                     this.player.body.setCollideWorldBounds(true)
                     this.physics.add.collider(this.player, mazeLayer)
                     this.player.health = 10
+                    this.player.isColliding = false
                     break
 
                 case 'octopus':
@@ -91,7 +92,7 @@ class Play extends Phaser.Scene {
                     squidb.body.setCollideWorldBounds(true)
                     this.physics.add.collider(squidb, mazeLayer)
                     // player loses health when colliding with squidb
-                    this.physics.add.collider(this.playersquidb, this.handleCreatureCOllision, null, this)
+                    this.physics.add.collider(this.player, squidb, this.handleCreatureCOllision, null, this)
                     // Add random movement logic for squidb here
                     this.setupRandomMovement(squidb)
                     break
@@ -238,17 +239,25 @@ class Play extends Phaser.Scene {
         })
     }
 
-    handleCreatureCollision(player, creature) {
-        this.sound.play('dull thud', { volume: 1})
+    handleCreatureCOllision(player, creature) {
+        if (!player.isColliding) {
+            this.sound.play('dull thud', { volume: 1 })
 
-        // reduce player health
-        player.health -= 1
-        this.healthtext.setText(`Health: ${player.health}`)
+            // reduce player health
+            player.health -= 1
+            this.healthtext.setText(`Health: ${player.health}`)
+            this.player.isColliding = true
+            
+            this.time.delayedCall(1000, () => {
+                player.isColliding = false
+            }, [], this)
 
-        // check if health is depleted
-        if (player.health <= 0) {
-            this.endGame()
+            // check if health is depleted
+            if (player.health <= 0) {
+                this.endGame()
+            }
         }
+
     }
 
     endGame() {
@@ -267,7 +276,7 @@ class Play extends Phaser.Scene {
         const isNewMostChests = this.chestfound > mostChests
         this.registry.set('sameGame', (isNewHighScore && isNewMostChests))
 
-        if(isNewHighScore) {
+        if (isNewHighScore) {
             this.registry.set('bestScore', this.score)
         }
         if (isNewMostChests) {
@@ -292,36 +301,36 @@ class Play extends Phaser.Scene {
                 this.cameras.main.worldView.x + this.cameras.main.width / 2,
                 this.cameras.main.worldView.y + this.cameras.main.height / 2,
                 'Congrats! Both scores are high scores!', {
-                    fontFamily: 'Arial',
-                    fontSize: '32px',
-                    fill: '#00ff00',
-                    backgroundColor: '#000000',
-                    align: 'center'
-                }
+                fontFamily: 'Arial',
+                fontSize: '32px',
+                fill: '#00ff00',
+                backgroundColor: '#000000',
+                align: 'center'
+            }
             ).setOrigin(0.5)
         } else if (isNewHighScore) {
             this.add.text(
                 this.cameras.main.worldView.x + this.cameras.main.width / 2,
                 this.cameras.main.worldView.y + this.main.cameras.main.height / 2,
                 'You got the new high score!', {
-                    fontFamily: 'Arial',
-                    fontSize: '32px',
-                    fill: '#00ff00',
-                    backgroundColor: '#000000',
-                    align: 'center'
-                }
+                fontFamily: 'Arial',
+                fontSize: '32px',
+                fill: '#00ff00',
+                backgroundColor: '#000000',
+                align: 'center'
+            }
             ).setOrigin(0.5)
         } else if (isNewMostChests) {
             this.add.text(
                 this.cameras.main.worldView.x + this.cameras.main.width / 2,
                 this.cameras.main.worldView.y + this.cameras.main.height / 2,
                 'You found the most chests!', {
-                    fontFamily: 'Arial', 
-                    fontSize: '32px',
-                    fill: '#00ff00',
-                    backgroundColor: '#000000',
-                    align: 'center'
-                }
+                fontFamily: 'Arial',
+                fontSize: '32px',
+                fill: '#00ff00',
+                backgroundColor: '#000000',
+                align: 'center'
+            }
             ).setOrigin(0.5)
         }
 
@@ -330,12 +339,12 @@ class Play extends Phaser.Scene {
             this.cameras.main.worldView.x + this.cameras.main.width / 2,
             this.cameras.main.worldView.y + this.cameras.main.height / 2 + 50,
             `Score: ${this.score} | Best Score: ${this.registry.get('bestScore')}`, {
-                fontFamily: 'Arial',
-                fontSize: '24px',
-                fill: '#ffffff',
-                backgroundColor: '#000000',
-                align: 'center'
-            }
+            fontFamily: 'Arial',
+            fontSize: '24px',
+            fill: '#ffffff',
+            backgroundColor: '#000000',
+            align: 'center'
+        }
         ).setOrigin(0.5)
 
         // display current and most chests
@@ -343,12 +352,12 @@ class Play extends Phaser.Scene {
             this.cameras.main.worldView.x + this.cameras.main.width / 2,
             this.cameras.main.worldView.y + this.cameras.main.height / 2 + 100,
             `Chests Found: ${this.chestfound} | Most Chests: ${this.registry.get('mostChests')}`, {
-                fontFamily: 'Arial',
-                fontSize: '24px',
-                fill: '#ffffff',
-                backgroundColor: '#000000',
-                align: 'center'
-            }
+            fontFamily: 'Arial',
+            fontSize: '24px',
+            fill: '#ffffff',
+            backgroundColor: '#000000',
+            align: 'center'
+        }
         ).setOrigin(0.5)
 
         // restart button
