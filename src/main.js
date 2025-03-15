@@ -23,7 +23,6 @@ let borderPadding = borderUISize / 3
 // sea creature and player interaction -- need to fix ---- WOORKING
 // sea creature and player sound effect  -- done but not implemented
 // save highest chest collected count and highest points scored in a single round -- done
-// check for new high scores and if both are new high scores, ask for name to display on leaderboard -- idk if im still doing this
-// spinning coin that adds health -- wip
+// spinning coin that adds health -- wip -- done
 // 3/14
-// collecting chests == more seconds
+// collecting chests == more seconds -- done
