@@ -25,6 +25,7 @@ class Play extends Phaser.Scene {
         this.load.audio('underwater', 'assets/underwater ambiance.wav')
         this.load.audio('open chest', 'assets/open chest.wav')
         this.load.audio('dull thud', 'assets/dull thud.wav')
+        this.load.audio('collect coin', 'assets/collect coin.wav')
 
         // animated coin (2 frames)
         this.load.spritesheet('coin', 'assets/coin.png', {
@@ -50,6 +51,14 @@ class Play extends Phaser.Scene {
         this.chestfound = 0
         this.gameOver = false
 
+        // coin animation
+        this.anims.create({
+            key: 'coinSpin',
+            frames: this.anims.generateFrameNumbers('coin', { start: 0, end: 1 }),
+            frameRate: 5,
+            repeat: -1
+        })
+
         // object layer
         const objectsLayer = map.getObjectLayer('objects')
 
@@ -68,6 +77,7 @@ class Play extends Phaser.Scene {
                     this.physics.add.collider(this.player, mazeLayer)
                     this.player.health = 10
                     this.player.isColliding = false
+                    this.player.speedBoostActive = false
                     break
 
                 case 'octopus':
@@ -113,6 +123,17 @@ class Play extends Phaser.Scene {
                     this.physics.add.overlap(this.player, chest, this.collectChest, null, this)
                     break
 
+                case 'coins':
+                    // create coin sprite
+                    const coin = this.physics.add.sprite(obj.x, obj.y, 'coin')
+                    // set immovable
+                    coin.body.setImmovable(true)
+                    coin.body.setCollideWorldBounds(true)
+                    // at collect coin interaction here
+                    this.physics.add.collider(coin, mazeLayer)
+                    this.physics.add.overlap(this.player, coin, this.collectCoin, null, this)
+                    coin.play('coinSpin')
+                    break
                 default:
                     console.warn(`Unknown object type: ${obj.type}`)
                     break
@@ -189,7 +210,6 @@ class Play extends Phaser.Scene {
         // Position the text at the top-left corner of the camera
         this.cheststext.setPosition(this.cameras.main.worldView.x + 10, this.cameras.main.worldView.y + 70)
 
-        // text to upper left to keep track of seconds left
         // maybe also add a interactable button to go directly back to main menu
 
         // fix timer
@@ -435,7 +455,8 @@ class Play extends Phaser.Scene {
         this.timerText.setText(`Time: ${remainingTime}`)
 
         // Player movement speed
-        const speed = 200
+        const baseSpeed = 200
+        const speed = this.player.speedBoostActive ? baseSpeed * 1.5 : baseSpeed
 
         // Reset player velocity
         this.player.setVelocity(0)
@@ -486,27 +507,6 @@ class Play extends Phaser.Scene {
                 }
             }
         }
-
-        /* // Check for collisions between player and sea creatures
-        if (this.checkCollision(this.player, this.octopus)) {
-            this.player.health -= 1
-            this.healthtext.setText(`Health: ${this.player.health}`)
-        }
-        if (this.checkCollision(this.player, this.squida)) {
-            this.player.health -= 1
-            this.healthtext.setText(`Health: ${this.player.health}`)
-        }
-        if (this.checkCollision(this.player, this.squidb)) {
-            this.player.health -= 1
-            this.healthtext.setText(`Health: ${this.player.health}`)
-        }
-
-        console.log(this.player.health)
-
-        // Check if player health is 0
-        if (this.player.health <= 0) {
-            this.endGame();
-        } */
     }
 
     collectChest(player, chest) {
@@ -517,11 +517,7 @@ class Play extends Phaser.Scene {
         const y = chest.y
 
         // hide the chest png
-        // chest.disableBody(true, true)
-        chest.destroy();
-
-        // disable chest body temporarily
-        // this.physics.world.disable(chest)
+        chest.destroy()
 
         //add more time to clock
         const remainingTime = this.clock.getRemainingSeconds()
@@ -531,7 +527,7 @@ class Play extends Phaser.Scene {
             callbackScope: this
         })
 
-        this.score += Phaser.Math.Between(25, 50)
+        this.score += Phaser.Math.Between(25, 125)
         console.log(this.score)
         this.pointstext.setText(`Points: ${this.score}`)
 
@@ -540,7 +536,7 @@ class Play extends Phaser.Scene {
         this.cheststext.setText(`Chests: ${this.chestfound}`)
 
         // Re-enable the chest after 30 seconds
-        this.time.delayedCall(30000, () => {
+        this.time.delayedCall(20000, () => {
             const chest = this.physics.add.sprite(x, y, 'chest')
             chest.body.setImmovable(true)
             chest.body.setCollideWorldBounds(true)
@@ -549,7 +545,49 @@ class Play extends Phaser.Scene {
         })
     }
 
-    /* checkCollision(player, creature) {
-        return this.physics.overlap(player, creature)
-    } */
+    collectCoin(player, coin) {
+        // play a sound
+        this.sound.play('collect coin', { loop: false, volume: 0.25 })
+
+        const x = coin.x
+        const y = coin.y
+
+        coin.destroy()
+
+        const randomEffect = Phaser.Math.Between(1,3)
+
+        switch (randomEffect) {
+            case 1:
+                // case 1: 50 points
+                console.log('points')
+                this.score += 50
+                this.pointstext.setText(`Points: ${this.score}`)
+                break
+            case 2:
+                // case 2: 1 health
+                console.log('health')
+                player.health += 1
+                this.healthtext.setText(`Health: ${player.health}`)
+            case 3:
+                // case 2: speed boost for 30 seconds
+                console.log('speed')
+                player.speedBoostActive = true
+
+                this.time.delayedCall(30000, () => {
+                    player.speedBoostActive = false
+                })
+        }
+
+        // Re-enable the chest after 30 seconds
+        this.time.delayedCall(30000, () => {
+            // create coin sprite
+            const coin = this.physics.add.sprite(x, y, 'coin')
+            // set immovable
+            coin.body.setImmovable(true)
+            coin.body.setCollideWorldBounds(true)
+            // at collect coin interaction here
+            this.physics.add.overlap(this.player, coin, this.collectCoin, null, this)
+            coin.play('coinSpin')
+        })
+    }
 }

@@ -18,7 +18,8 @@ class Credits extends Phaser.Scene {
         this.add.text(100, 200, 'underwater sound from\nhttps://freesound.org/people/akemov/sounds/255597/', {fontSize: '12px', fill: '#fff'})
         this.add.text(100, 225, 'chest opening sound from\nhttps://pixabay.com/sound-effects/short-success-sound-glockenspiel-treasure-video-game-6346/', {fontSize: '12px', fill: '#fff'})
         this.add.text(100, 250, 'player and sea creater thud sound from\nhttps://freesound.org/people/OwlStorm/sounds/209015/', {fontSize: '12px', fill: '#fff'})
-
+        // https://freesound.org/people/rhodesmas/sounds/342751/
+        
         // back button
         let backButton = this.add.text(100, 400, 'Back to Menu', { 
             fontSize: '24px', 
