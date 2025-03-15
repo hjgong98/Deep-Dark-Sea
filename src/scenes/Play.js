@@ -25,6 +25,12 @@ class Play extends Phaser.Scene {
         this.load.audio('underwater', 'assets/underwater ambiance.wav')
         this.load.audio('open chest', 'assets/open chest.wav')
         this.load.audio('dull thud', 'assets/dull thud.wav')
+
+        // animated coin (2 frames)
+        this.load.spritesheet('coin', 'assets/coin.png', {
+            frameWidth: 32,
+            frameHeight: 32
+        })
     }
 
     create() {
@@ -93,7 +99,6 @@ class Play extends Phaser.Scene {
                     this.physics.add.collider(squidb, mazeLayer)
                     // player loses health when colliding with squidb
                     this.physics.add.collider(this.player, squidb, this.handleCreatureCOllision, null, this)
-                    this.physics.add.collider(this.player, squidb, this.handleCreatureCOllision, null, this)
                     // Add random movement logic for squidb here
                     this.setupRandomMovement(squidb)
                     break
@@ -142,14 +147,6 @@ class Play extends Phaser.Scene {
         this.cameras.main.startFollow(this.player, true, 0.25, 0.25)
 
         this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
-
-        // this.cursors = this.input.keyboard.createCursorKeys()
-
-        /* this.clock = this.time.delayedCall(2000, () => {
-            this.add.text(game.config.width / 2, game.config.height / 2, 'GAME OVER', scoreConfig).setOrigin(0.5)
-            this.add.text(game.config.width / 2, game.config.height / 2 + 64, 'Press (R) to Restart or <- for Menu', scoreConfig).setOrigin(0.5)
-            this.gameOver = true
-        }, null, this) */
 
         // Create the text object -- edit it to keep track of the health of player sprite
         this.healthtext = this.add.text(0, 0, `Health: ${this.player.health}`, {
@@ -513,7 +510,7 @@ class Play extends Phaser.Scene {
     }
 
     collectChest(player, chest) {
-        this.sound.play('open chest', { loop: false, volume: 1 })
+        this.sound.play('open chest', { loop: false, volume: 0.25 })
 
         //save the coordinates
         const x = chest.x
@@ -525,6 +522,14 @@ class Play extends Phaser.Scene {
 
         // disable chest body temporarily
         // this.physics.world.disable(chest)
+
+        //add more time to clock
+        const remainingTime = this.clock.getRemainingSeconds()
+        this.clock.reset({
+            delay: (remainingTime + 5) * 1000,
+            callback: this.endGame,
+            callbackScope: this
+        })
 
         this.score += Phaser.Math.Between(25, 50)
         console.log(this.score)
