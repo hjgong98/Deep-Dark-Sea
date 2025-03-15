@@ -18,27 +18,32 @@ class Objectives extends Phaser.Scene {
         
 
         // Display objectives
-        this.add.text(100, 170, '1. Collect chests for points', {
+        this.add.text(100, 160, '1. Collect chests for points', {
             fontSize: '16px',
             fill: '#fff'
         })
 
-        this.add.text(100, 210, '2. Time limit: 2 minutes', {
+        this.add.text(100, 200, '2. Time limit: 2 minutes', {
             fontSize: '16px',
             fill: '#fff'
         })
 
-        this.add.text(100, 250, '3. Bumping into sea creatires makes you lose hp', {
+        this.add.text(100, 240, '3. Bumping into sea creatires makes you lose hp', {
             fontSize: '16px',
             fill: '#fff'
         })
 
-        this.add.text(100, 290, '4. Collecting chests adds a few seconds to the timer', {
+        this.add.text(100, 280, '4. Collecting chests adds a few seconds to the timer', {
             fontSize: '16px',
             fill: '#fff'
         })
 
-        this.add.text(100, 330, '5. Game ends when time runs out or health reaches 0', {
+        this.add.text(100, 320, '5. Collect coins for something interesting', {
+            fontSize: '16px',
+            fill: '#fff'
+        })
+
+        this.add.text(100, 360, '6. Game ends when time runs out or health reaches 0', {
             fontSize: '16px',
             fill: '#fff'
         })
