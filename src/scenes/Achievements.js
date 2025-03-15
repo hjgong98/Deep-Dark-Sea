@@ -15,22 +15,22 @@ class Achievements extends Phaser.Scene {
 
         const bestScore = this.registry.get('bestScore') || 0
         const mostChests = this.registry.get('mostChests') || 0
-        const highScoreAndChestsInSameGame = this.registry.get('highScoreAndChestsInSameGame') || false
+        const scoresInOneGame = this.registry.get('sameGame') || false
 
-        // Display highest score
+        // display highest score
         this.add.text(100, 150, `Highest Score: ${bestScore}`, {
             fontSize: '24px',
             fill: '#fff'
         })
 
-        // Display most chests found
+        // display most chests found
         this.add.text(100, 200, `Most Chests Found: ${mostChests}`, {
             fontSize: '24px',
             fill: '#fff'
         })
 
-        // Display whether both high scores were achieved in the same game
-        if (highScoreAndChestsInSameGame) {
+        // display whether both high scores were achieved in the same game
+        if (scoresInOneGame) {
             this.add.text(100, 250, 'Achieved both high scores in the same game!', {
                 fontSize: '24px',
                 fill: '#00ff00' // Green text for emphasis

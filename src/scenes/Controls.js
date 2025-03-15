@@ -13,7 +13,7 @@ class Controls extends Phaser.Scene {
 
         this.add.text(100, 100, 'Instructions', { fontSize: '32px', fill: '#fff' })
 
-        // Control options
+        // control options
         let wasdOption = this.add.text(100, 200, 'WASD', { fontSize: '24px', fill: '#fff' }).setInteractive()
         let arrowsOption = this.add.text(100, 250, 'Arrows', { fontSize: '24px', fill: '#fff' }).setInteractive()
         let mouseOption = this.add.text(100, 300, 'Mouse', { fontSize: '24px', fill: '#fff' }).setInteractive()
@@ -25,10 +25,10 @@ class Controls extends Phaser.Scene {
     }
     
     selectControls(controlScheme) {
-        // Save the selected control scheme to the registry
+        // save the selected control scheme to the registry
         this.registry.set('controls', controlScheme)
 
-        // Return to the Menu scene
+        // return to the Menu scene
         this.scene.start('Menu')
     }
 }

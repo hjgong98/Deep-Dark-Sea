@@ -15,8 +15,6 @@ class Objectives extends Phaser.Scene {
         // menu UI
         this.add.text(100, 100, 'Objectives', { fontSize: '32px', fill: '#fff' })
 
-        
-
         // Display objectives
         this.add.text(100, 160, '1. Collect chests for points', {
             fontSize: '16px',

@@ -36,7 +36,7 @@ class Instructions extends Phaser.Scene {
         }
 
 
-        // Button to return to the Menu
+        // button to return to the Menu
         let menuButton = this.add.text(100, 375, 'Back to Menu', { 
             fontSize: '24px', 
             fill: '#fff' 

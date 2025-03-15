@@ -32,8 +32,8 @@ class Menu extends Phaser.Scene {
             this.scene.start('Instructions')
         })
 
-        // go to sprite scene
-        let spritesButton = this.add.text(100, 255, 'Objectives', { 
+        // go to objectives scene
+        let objectivesButton = this.add.text(100, 255, 'Objectives', { 
             fontSize: '24px', 
             fill: '#fff' 
         }).setInteractive().on('pointerdown', () => {
@@ -48,7 +48,7 @@ class Menu extends Phaser.Scene {
             this.scene.start('Play')
         })
 
-        // achievements
+        // achievements scene
         let achievementButton = this.add.text(100, 335, 'Achievements', {
             fontSize: '24px',
             fill: '#fff'
@@ -56,7 +56,7 @@ class Menu extends Phaser.Scene {
             this.scene.start('Achievements')
         })
 
-        // credits
+        // credits scene
         let creditsButton = this.add.text(100, 375, 'Credits', {
             fontSize: '24px',
             fill: '#fff'

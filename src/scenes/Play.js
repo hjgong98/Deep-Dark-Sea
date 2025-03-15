@@ -63,11 +63,6 @@ class Play extends Phaser.Scene {
         const objectsLayer = map.getObjectLayer('objects')
 
         // iterate through objects 
-        // class player: create sprite called player with sprite.png at that location that can be moved by the player
-        // class octopus: create sprite called octopus with octopus.png that moves randomly, can collide with player and boundaries
-        // class squida: create sprite called squida with squid1.png that moves randomly, can collide with player and boundaries
-        // of class squidb: create sprite called squidb with squid2.png that moves randomly, can collide with player and boundaries
-        // of class chest: create sprite called chest with chest.png that can be collected for points and temporarily hidden from the game
         objectsLayer.objects.forEach(obj => {
             switch (obj.type) {
                 case 'player':
@@ -75,6 +70,7 @@ class Play extends Phaser.Scene {
                     this.player = this.physics.add.sprite(obj.x, obj.y, 'player')
                     this.player.body.setCollideWorldBounds(true)
                     this.physics.add.collider(this.player, mazeLayer)
+                    // player variables
                     this.player.health = 10
                     this.player.isColliding = false
                     this.player.speedBoostActive = false
@@ -169,7 +165,7 @@ class Play extends Phaser.Scene {
 
         this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
 
-        // Create the text object -- edit it to keep track of the health of player sprite
+        // health of player sprite
         this.healthtext = this.add.text(0, 0, `Health: ${this.player.health}`, {
             fontFamily: 'Arial',
             fontSize: '24px',
@@ -177,13 +173,13 @@ class Play extends Phaser.Scene {
             backgroundColor: '#000000'
         })
 
-        // Fix the text to the camera
+        // fix the text to the camera
         this.healthtext.setScrollFactor(0)
 
-        // Position the text at the top-left corner of the camera
+        // top left corner of camera
         this.healthtext.setPosition(this.cameras.main.worldView.x + 10, this.cameras.main.worldView.y + 10)
 
-        // add a text object to keep track of points and chests collected
+        // total points accumulated
         this.pointstext = this.add.text(0, 0, `Points ${this.score}`, {
             fontFamily: 'Arial',
             fontSize: '24px',
@@ -191,12 +187,13 @@ class Play extends Phaser.Scene {
             backgroundColor: '#000000'
         })
 
-        // Fix the text to the camera
+        // fix the text to the camera
         this.pointstext.setScrollFactor(0)
 
-        // Position the text at the top-left corner of the camera
+        // top left of camera, under health
         this.pointstext.setPosition(this.cameras.main.worldView.x + 10, this.cameras.main.worldView.y + 40)
 
+        // total chests collected
         this.cheststext = this.add.text(0, 0, `Chests: ${this.chestfound}`, {
             fontFamily: 'Arial',
             fontSize: '24px',
@@ -204,15 +201,15 @@ class Play extends Phaser.Scene {
             backgroundColor: '#000000'
         })
 
-        // Fix the text to the camera
+        // fix the text to the camera
         this.cheststext.setScrollFactor(0)
 
-        // Position the text at the top-left corner of the camera
+        // top left of camera, uner points
         this.cheststext.setPosition(this.cameras.main.worldView.x + 10, this.cameras.main.worldView.y + 70)
 
         // maybe also add a interactable button to go directly back to main menu
 
-        // fix timer
+        // timer config
         const timerConfig = {
             fontFamily: 'Courier',
             fontSize: '28px',
@@ -226,23 +223,26 @@ class Play extends Phaser.Scene {
             fixedWidth: 150
         }
 
+        // timer text
         this.timerText = this.add.text(0, 0, 'Time: 120', timerConfig)
         this.timerText.setScrollFactor(0)
         this.timerText.setPosition(
-            this.cameras.main.worldView.x + this.cameras.main.width - this.timerText.width - 10, // X position (right-aligned)
-            this.cameras.main.worldView.y + 10 // Y position (top-aligned)
+            // top right corner
+            this.cameras.main.worldView.x + this.cameras.main.width - this.timerText.width - 10,
+            this.cameras.main.worldView.y + 10 
         )
 
-        // Set up the game timer
-        this.clock = this.time.delayedCall(120000, () => { // 120 seconds -- change to longer later on
+        // set up timer
+        this.clock = this.time.delayedCall(120000, () => {
             this.endGame()
         }, null, this)
     }
 
     setupRandomMovement(sprite) {
-        // Random movement logic
+        // random moement logic
         this.time.addEvent({
-            delay: Phaser.Math.Between(1000, 3000), // Random delay between 1 and 3 seconds
+            // random delay 1 - 3 seconds
+            delay: Phaser.Math.Between(1000, 3000),
             callback: () => {
                 const directions = [
                     { x: 1, y: 0 },   // Right
@@ -251,7 +251,9 @@ class Play extends Phaser.Scene {
                     { x: 0, y: -1 }   // Up
                 ]
                 const direction = Phaser.Utils.Array.GetRandom(directions)
-                sprite.setVelocity(direction.x * 100, direction.y * 100) // Move in random direction
+
+                // move in random direction
+                sprite.setVelocity(direction.x * 100, direction.y * 100)
             },
             loop: true
         })
@@ -275,13 +277,12 @@ class Play extends Phaser.Scene {
                 this.endGame()
             }
         }
-
     }
 
     endGame() {
         this.gameOver = true
 
-        // Freeze all sprites and physics
+        // freeze all sprites and physics
         this.physics.pause()
 
         // retrieve best score and most chests from registry
@@ -427,38 +428,20 @@ class Play extends Phaser.Scene {
         })
     }
 
-    setupRandomMovement(sprite) {
-        // Random movement logic (same as before)
-        this.time.addEvent({
-            delay: Phaser.Math.Between(1000, 3000),
-            callback: () => {
-                const directions = [
-                    { x: 1, y: 0 },   // Right
-                    { x: -1, y: 0 },  // Left
-                    { x: 0, y: 1 },   // Down
-                    { x: 0, y: -1 }   // Up
-                ]
-                const direction = Phaser.Utils.Array.GetRandom(directions)
-                sprite.setVelocity(direction.x * 100, direction.y * 100)
-            },
-            loop: true
-        })
-    }
-
     update() {
         if (this.gameOver) {
             return
         }
 
-        // Update timer text
+        // update timer text
         const remainingTime = Math.ceil(this.clock.getRemainingSeconds());
         this.timerText.setText(`Time: ${remainingTime}`)
 
-        // Player movement speed
+        // player movement speed
         const baseSpeed = 200
         const speed = this.player.speedBoostActive ? baseSpeed * 1.5 : baseSpeed
 
-        // Reset player velocity
+        // reset player velocity
         this.player.setVelocity(0)
 
         if (this.cursors) {
@@ -482,24 +465,23 @@ class Play extends Phaser.Scene {
             const pointer = this.input.activePointer
 
             if (pointer.isDown) {
-                //this.mouseTarget = { x: pointer.worldX, y: pointer.worldY }
                 this.mouseTarget = this.cameras.main.getWorldPoint(pointer.x, pointer.y)
             }
 
             if (this.mouseTarget) {
-                // Calculate direction vector
+                // calculate direction vector
                 const direction = new Phaser.Math.Vector2(
                     this.mouseTarget.x - this.player.x,
                     this.mouseTarget.y - this.player.y
                 );
 
-                // Normalize the direction vector and scale it by speed
+                // normalize the direction vector and scale it by speed
                 direction.normalize().scale(speed);
 
-                // Set player velocity
+                // set player velocity
                 this.player.setVelocity(direction.x, direction.y)
 
-                // Stop the player when close to the target
+                // stop the player when close to the target
                 const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.mouseTarget.x, this.mouseTarget.y)
                 if (distance < 10) {
                     this.player.setVelocity(0, 0);
@@ -519,7 +501,7 @@ class Play extends Phaser.Scene {
         // hide the chest png
         chest.destroy()
 
-        //add more time to clock
+        // add more time to clock
         const remainingTime = this.clock.getRemainingSeconds()
         this.clock.reset({
             delay: (remainingTime + 5) * 1000,
@@ -535,12 +517,11 @@ class Play extends Phaser.Scene {
         console.log(this.chestfound)
         this.cheststext.setText(`Chests: ${this.chestfound}`)
 
-        // Re-enable the chest after 30 seconds
+        // re-enable the chest after 30 seconds
         this.time.delayedCall(20000, () => {
             const chest = this.physics.add.sprite(x, y, 'chest')
             chest.body.setImmovable(true)
             chest.body.setCollideWorldBounds(true)
-            // add collect chest interaction here
             this.physics.add.overlap(this.player, chest, this.collectChest, null, this)
         })
     }
@@ -578,7 +559,7 @@ class Play extends Phaser.Scene {
                 })
         }
 
-        // Re-enable the chest after 30 seconds
+        // re-enable the coin after 30 seconds
         this.time.delayedCall(30000, () => {
             // create coin sprite
             const coin = this.physics.add.sprite(x, y, 'coin')
